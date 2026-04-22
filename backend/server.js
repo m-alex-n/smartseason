@@ -1,11 +1,10 @@
 // backend/server.js
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import pkg from 'pg';
-const { Pool } = pkg;
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+const express = require('express');
+const cors = require('cors');
+const dotenv = require('dotenv');
+const { Pool } = require('pg');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 dotenv.config();
 
@@ -22,7 +21,7 @@ app.use(cors());
 app.use(express.json());
 
 // JWT Secret
-const JWT_SECRET = 'your-secret-key-change-in-production';
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
 // Middleware to verify token
 const authenticateToken = (req, res, next) => {
@@ -188,7 +187,7 @@ app.put('/api/fields/:id', authenticateToken, async (req, res) => {
     }
     
     // Update field
-    const updateQuery = [];
+    const updateQuery = [];  
     const params = [];
     let paramIndex = 1;
     
@@ -325,77 +324,18 @@ function computeFieldStatus(field) {
   return 'Active';
 }
 
-// Initialize database tables
-async function initDatabase() {
-  try {
-    // Users table
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS users (
-        id SERIAL PRIMARY KEY,
-        username VARCHAR(100) UNIQUE NOT NULL,
-        password_hash VARCHAR(255) NOT NULL,
-        role VARCHAR(20) DEFAULT 'agent',
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
-    
-    // Fields table
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS fields (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(200) NOT NULL,
-        crop_type VARCHAR(100) NOT NULL,
-        planting_date DATE NOT NULL,
-        current_stage VARCHAR(50) DEFAULT 'planted',
-        assigned_agent_id INTEGER REFERENCES users(id),
-        created_by INTEGER REFERENCES users(id),
-        notes TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
-    
-    // Field updates history table
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS field_updates (
-        id SERIAL PRIMARY KEY,
-        field_id INTEGER REFERENCES fields(id) ON DELETE CASCADE,
-        updated_by INTEGER REFERENCES users(id),
-        stage_change VARCHAR(50),
-        notes TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
-    
-    // Check if admin exists
-    const adminCheck = await pool.query('SELECT * FROM users WHERE username = $1', ['admin']);
-    if (adminCheck.rows.length === 0) {
-      const hashedPassword = await bcrypt.hash('admin123', 10);
-      await pool.query(
-        'INSERT INTO users (username, password_hash, role) VALUES ($1, $2, $3)',
-        ['admin', hashedPassword, 'admin']
-      );
-      console.log('Created default admin: admin / admin123');
-    }
-    
-    // Check if test agent exists
-    const agentCheck = await pool.query('SELECT * FROM users WHERE username = $1', ['agent1']);
-    if (agentCheck.rows.length === 0) {
-      const hashedPassword = await bcrypt.hash('agent123', 10);
-      await pool.query(
-        'INSERT INTO users (username, password_hash, role) VALUES ($1, $2, $3)',
-        ['agent1', hashedPassword, 'agent']
-      );
-      console.log('Created default agent: agent1 / agent123');
-    }
-    
-    console.log('Database initialized successfully');
-  } catch (error) {
-    console.error('Database initialization error:', error);
-  }
-}
-
-app.listen(PORT, async () => {
-  await initDatabase();
-  console.log(`Server running on port ${PORT}`);
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
+
+// Export for Vercel serverless
+module.exports = app;
+
+// Only run server directly if not in Vercel
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, async () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}

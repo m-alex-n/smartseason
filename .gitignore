@@ -144,3 +144,6 @@ backend/concat_files.sh
 backend/catFileOutput.txt
 frontend/concat_files.sh
 frontend/catFileOutput.txt
+concat_files.sh
+catFileOutput.txt
+

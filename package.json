@@ -1,0 +1,8 @@
+{
+    "name": "smartseason",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+      "vercel-build": "cd frontend && npm install && npm run build && cd ../backend && npm install && npx prisma generate"
+    }
+  }
