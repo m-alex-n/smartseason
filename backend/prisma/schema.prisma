@@ -1,0 +1,79 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  ADMIN
+  AGENT
+}
+
+enum FieldStage {
+  PLANTED
+  GROWING
+  READY
+  HARVESTED
+}
+
+model User {
+  id           String        @id @default(cuid())
+  email        String        @unique
+  passwordHash String
+  role         UserRole
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  assignments  FieldAssignment[]
+  updates      FieldUpdate[] @relation("UpdateAuthor")
+}
+
+model Field {
+  id           String            @id @default(cuid())
+  name         String
+  cropType     String
+  plantingDate DateTime
+  currentStage FieldStage
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  assignments  FieldAssignment[]
+  updates      FieldUpdate[]
+
+  @@index([currentStage])
+  @@index([plantingDate])
+}
+
+model FieldAssignment {
+  userId     String
+  fieldId    String
+  assignedAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  field Field @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+
+  @@id([userId, fieldId])
+  @@index([fieldId])
+}
+
+model FieldUpdate {
+  id        String     @id @default(cuid())
+  fieldId   String
+  agentId   String
+  stage     FieldStage
+  notes     String?
+  createdAt DateTime   @default(now())
+
+  field Field @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+  agent User  @relation("UpdateAuthor", fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([fieldId, createdAt])
+  @@index([agentId, createdAt])
+}

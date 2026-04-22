@@ -1,0 +1,146 @@
+# ============================================
+# Dependencies
+# ============================================
+node_modules/
+frontend/node_modules/
+backend/node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# ============================================
+# Build outputs
+# ============================================
+dist/
+build/
+.frontend/dist/
+backend/dist/
+out/
+.next/
+*.tsbuildinfo
+
+# ============================================
+# Environment files (sensitive data)
+# ============================================
+.env
+backend/.env
+frontend/.env
+.env.local
+.env.development
+.env.production
+.env.production.local
+.env.development.local
+.env.test
+.env.test.local
+*.env*
+!.env.example
+
+# ============================================
+# Database
+# ============================================
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+prisma/*.db
+prisma/*.db-journal
+backend/prisma/*.db
+backend/prisma/*.db-journal
+
+# ============================================
+# Logs
+# ============================================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+pm2-*.log
+
+# ============================================
+# OS files
+# ============================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*.swp
+*.swo
+*~
+desktop.ini
+
+# ============================================
+# IDE / Editor files
+# ============================================
+.vscode/
+.idea/
+*.sublime-*
+.project
+.classpath
+.settings/
+*.iml
+
+# ============================================
+# Testing
+# ============================================
+coverage/
+.nyc_output/
+*.test.js
+*.spec.js
+__tests__/
+__mocks__/
+
+# ============================================
+# Temporary files
+# ============================================
+*.tmp
+*.temp
+.cache/
+.tmp/
+tmp/
+
+# ============================================
+# Deployment
+# ============================================
+.vercel/
+vercel.json.backup
+.now/
+.parcel-cache/
+
+# ============================================
+# Prisma
+# ============================================
+backend/prisma/migrations/*.db
+!backend/prisma/migrations/migration_lock.toml
+
+# ============================================
+# Misc
+# ============================================
+*.bak
+*.backup
+*.pid
+*.seed
+*.pid.lock
+*.tgz
+*.rar
+*.zip
+
+# ============================================
+# Debug
+# ============================================
+debug.log
+npm-debug.log
+
+# ============================================
+# Local configuration
+# ============================================
+*.local
+config.local.
+backend/concat_files.sh
+backend/catFileOutput.txt
+frontend/concat_files.sh
+frontend/catFileOutput.txt
